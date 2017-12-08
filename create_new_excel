@@ -1,0 +1,17 @@
+Sub addworkbook()
+Dim wb As Workbook
+
+Application.DisplayAlerts = False
+Application.ScreenUpdating = False
+
+Set wb = GetObject(ThisWorkbook.Path & "\源文件.xlsx")
+Set newb = Workbooks.Add
+wb.Activate
+wb.Sheets(1).Rows("1:25").Copy newb.Sheets(1).[a1]
+newb.SaveAs ThisWorkbook.Path & "\新文件.xlsx"
+newb.Close 1
+
+Application.DisplayAlerts = True
+Application.ScreenUpdating = True
+
+End Sub
