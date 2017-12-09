@@ -1,0 +1,73 @@
+Sub combine_add_file()
+
+today_day = Format(Date, "yyyymmdd")
+'today_day = "20171209"
+If Dir(ThisWorkbook.Path & "\data_combine\" & today_day, vbDirectory) <> "" Then
+       MsgBox "文件夹存在，程序即将退出！"
+       GoTo skip
+Else
+       MkDir ThisWorkbook.Path & "\data_combine\" & today_day
+End If
+
+If Dir(ThisWorkbook.Path & "\data_combine\" & today_day & "\rawdata", vbDirectory) <> "" Then
+       MsgBox "文件夹存在"
+Else
+       MkDir ThisWorkbook.Path & "\data_combine\" & today_day & "\rawdata"
+End If
+
+MsgBox today_day & "文件夹创建成功！"
+Exit Sub
+skip:
+Exit Sub
+
+End Sub
+
+Sub combine_myfile()
+'获取所有excel名
+Application.DisplayAlerts = False
+Application.ScreenUpdating = False
+
+Dim FileName, allfilename(), n%
+today_day = Format(Date, "yyyymmdd")
+datelabel = Format(Date, "yyyy年m月d日")
+mypath = ThisWorkbook.Path & "\data_combine\" & today_day & "\rawdata\"
+
+FileName = Dir(mypath & "*.*")
+
+Do Until Len(FileName) = 0
+    n = n + 1
+    ReDim Preserve allfilename(1 To n)
+    allfilename(n) = FileName
+    FileName = Dir
+Loop
+
+'合并成一个excel
+'复制表头
+Set newb = Workbooks.Add
+Set wb = GetObject(ThisWorkbook.Path & "\data_combine\" & today_day & "\rawdata\" & allfilename(1))
+wb.Activate
+wb.Sheets(1).Rows("1:1").Copy newb.Sheets(1).[a1]
+'依次复制内容
+For i = 1 To n
+Set wb = GetObject(ThisWorkbook.Path & "\data_combine\" & today_day & "\rawdata\" & allfilename(i))
+wb.Activate
+end_row = wb.Sheets(1).Range("a1").End(xlDown).Row
+wb.Sheets(1).Rows("2:" & end_row).Copy newb.Sheets(1).Range("a1048576").End(xlUp).Offset(1, 0)
+wb.Close
+Next i
+
+newb.SaveAs ThisWorkbook.Path & "\data_combine\" & today_day & "\result-" & today_day & ".xlsx"
+newb.Close 1
+
+
+Application.DisplayAlerts = True
+Application.ScreenUpdating = True
+
+MsgBox datelabel & "的数据已合并成功！"
+
+
+
+End Sub
+
+
+
