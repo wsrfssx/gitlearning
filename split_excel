@@ -1,0 +1,97 @@
+Sub split_add_file()
+
+today_day = Format(Date, "yyyymmdd")
+'today_day = "20171209"
+If Dir(ThisWorkbook.Path & "\data_split\" & today_day, vbDirectory) <> "" Then
+       MsgBox "文件夹存在，程序即将退出！"
+       GoTo skip
+Else
+       MkDir ThisWorkbook.Path & "\data_split\" & today_day
+End If
+
+If Dir(ThisWorkbook.Path & "\data_split\" & today_day & "\output_c0", vbDirectory) <> "" Then
+       MsgBox "文件夹存在"
+Else
+       MkDir ThisWorkbook.Path & "\data_split\" & today_day & "\output_c0"
+End If
+
+If Dir(ThisWorkbook.Path & "\data_split\" & today_day & "\output_m0", vbDirectory) <> "" Then
+       MsgBox "文件夹存在" '
+Else
+       MkDir ThisWorkbook.Path & "\data_split\" & today_day & "\output_m0"
+End If
+
+MsgBox today_day & "文件夹创建成功！"
+Exit Sub
+skip:
+Exit Sub
+
+End Sub
+
+Sub split_c0_addworkbook()
+Dim wb As Workbook
+
+Application.DisplayAlerts = False
+Application.ScreenUpdating = False
+
+today_day = Format(Date, "yyyymmdd")
+datelabel = Format(Date, "yyyy年m月d日")
+Set wb = GetObject(ThisWorkbook.Path & "\data_split\" & today_day & "\DMJ2-C0-" & today_day & "-all.xlsx")
+
+
+
+k = WorksheetFunction.Ceiling((wb.Sheets(1).Range("a1").End(xlDown).Row - 1) / 1000, 1)
+For i = 1 To k
+
+Set newb = Workbooks.Add
+wb.Activate
+wb.Sheets(1).Rows("1:1").Copy newb.Sheets(1).[a1]
+wb.Sheets(1).Rows((i - 1) * 1000 + 2 & ":" & i * 1000 + 1).Copy newb.Sheets(1).[a2]
+newb.SaveAs ThisWorkbook.Path & "\data_split\" & today_day & "\output_c0\DMJ2-C0-" & today_day & "-" & i & ".xlsx"
+newb.Close 1
+
+Next i
+
+
+
+
+Application.DisplayAlerts = True
+Application.ScreenUpdating = True
+
+MsgBox datelabel & "的数据运行成功！已生成" & k & "个C0子文件！"
+End Sub
+
+Sub split_m0_addworkbook()
+Dim wb As Workbook
+
+Application.DisplayAlerts = False
+Application.ScreenUpdating = False
+
+today_day = Format(Date, "yyyymmdd")
+datelabel = Format(Date, "yyyy年m月d日")
+Set wb = GetObject(ThisWorkbook.Path & "\data_split\" & today_day & "\DMJ2-M0-" & today_day & "-all.xlsx")
+
+
+
+k = WorksheetFunction.Ceiling((wb.Sheets(1).Range("a1").End(xlDown).Row - 1) / 1000, 1)
+For i = 1 To k
+
+Set newb = Workbooks.Add
+wb.Activate
+wb.Sheets(1).Rows("1:1").Copy newb.Sheets(1).[a1]
+wb.Sheets(1).Rows((i - 1) * 1000 + 2 & ":" & i * 1000 + 1).Copy newb.Sheets(1).[a2]
+newb.SaveAs ThisWorkbook.Path & "\data_split\" & today_day & "\output_m0\DMJ2-M0-" & today_day & "-" & i & ".xlsx"
+newb.Close 1
+
+Next i
+
+
+
+
+Application.DisplayAlerts = True
+Application.ScreenUpdating = True
+
+MsgBox datelabel & "的数据运行成功！已生成" & k & "个M0子文件！"
+End Sub
+
+
